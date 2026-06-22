@@ -183,7 +183,7 @@ export default async function EditFollowUpPage({
 
           <select
             name="status"
-            defaultValue={followUp.status}
+            defaultValue={followUp.status ?? "pending"}
             className="w-full rounded-xl border p-3"
           >
             <option value="pending">

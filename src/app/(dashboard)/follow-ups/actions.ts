@@ -97,10 +97,10 @@ export async function completeFollowUp(
     const { error } = await supabase
     .from("follow_ups")
     .update({
-        status: "completed",
-        completed_at: now,
-        updated_at: now,
-    })
+      status: "completed",
+      completed_at: now,
+      updated_at: now,
+    } as any)
     .eq("id", id)
     .eq("user_id", broker.profile.id);
 
@@ -184,7 +184,7 @@ export async function updateFollowUp(
           ? now
           : null,
       updated_at: now,
-    })
+    } as any)
     .eq("id", id)
     .eq("user_id", broker.profile.id);
 

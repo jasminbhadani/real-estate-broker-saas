@@ -16,7 +16,7 @@ interface PropertyFormProps {
     area_value: number | null;
     price: number | null;
     purpose: string | null;
-    status: string;
+    status: string | null;
     notes: string | null;
   };
 }

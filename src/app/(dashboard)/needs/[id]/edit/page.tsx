@@ -115,8 +115,7 @@ export default async function EditNeedPage({
             requirement.client_name ?? "",
           mobile:
             requirement.mobile ?? "",
-          property_type:
-            requirement.property_type,
+          property_type: requirement.property_type ?? undefined,
           purpose:
             (requirement as any).purpose ??
             "buy",
