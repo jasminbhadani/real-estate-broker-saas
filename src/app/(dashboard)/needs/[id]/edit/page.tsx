@@ -69,6 +69,14 @@ export default async function EditNeedPage({
       "area"
     ) as string;
 
+    const location = formData.get(
+      "location"
+    ) as string;
+
+    const configuration = formData.get(
+      "configuration"
+    ) as string;
+
     const budget = Number(
       formData.get("budget") || 0
     );
@@ -83,7 +91,9 @@ export default async function EditNeedPage({
         client_name,
         mobile,
         property_type,
+        location,
         purpose,
+        configuration,
         area,
         budget,
         notes,
@@ -116,9 +126,13 @@ export default async function EditNeedPage({
           mobile:
             requirement.mobile ?? "",
           property_type: requirement.property_type ?? undefined,
+          location:
+            requirement.location ?? "",
           purpose:
             (requirement as any).purpose ??
-            "buy",
+            "buy",          
+          configuration:
+            requirement.configuration ?? "",
           area:
             requirement.area ?? "",
           budget:

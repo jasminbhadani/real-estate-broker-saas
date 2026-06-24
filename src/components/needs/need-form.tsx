@@ -10,6 +10,8 @@ type NeedFormProps = {
       | "warehouse";
     purpose?: "buy" | "rent" | "sell";
     area?: string;
+    location?: string;
+    configuration?: string;
     budget?: number;
     notes?: string;
   };
@@ -88,6 +90,19 @@ export function NeedForm({
 
       <div>
         <label className="mb-1 block text-sm font-medium">
+          Location
+        </label>
+
+        <input
+          name="location"
+          defaultValue={defaultValues?.location}
+          placeholder="e.g. Satellite, Bopal, Gota"
+          className="w-full rounded-xl border px-3 py-2"
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium">
           Purpose
         </label>
 
@@ -115,6 +130,19 @@ export function NeedForm({
             Sell
           </option>
         </select>
+      </div>
+      
+      <div>
+        <label className="mb-1 block text-sm font-medium">
+          Configuration
+        </label>
+
+        <input
+          name="configuration"
+          defaultValue={defaultValues?.configuration}
+          placeholder="e.g. 2 BHK, 3 BHK, Commercial Plot"
+          className="w-full rounded-xl border px-3 py-2"
+        />
       </div>
 
       <div>

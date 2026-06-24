@@ -46,7 +46,11 @@ export default async function NeedsPage({
 
   if (search) {
     query = query.or(
-      `client_name.ilike.%${search}%,mobile.ilike.%${search}%,area.ilike.%${search}%`
+      `client_name.ilike.%${search}%,
+      mobile.ilike.%${search}%,
+      area.ilike.%${search}%,
+      location.ilike.%${search}%,
+      configuration.ilike.%${search}%`
     );
   }
 
@@ -283,9 +287,25 @@ export default async function NeedsPage({
                       )}
                     </div>
 
-                    <div className="mt-2 text-sm text-muted-foreground">
-                      📍 {requirement.area}
-                    </div>
+                    {requirement.configuration?.trim() && (
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        🏡 {requirement.configuration}
+                      </div>
+                    )}
+
+                    <>
+                      {requirement.location?.trim() && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          📍 {requirement.location}
+                        </div>
+                      )}
+
+                      {requirement.area?.trim() && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          📐 {requirement.area}
+                        </div>
+                      )}
+                    </>
 
                     <div className="mt-3 text-lg font-semibold">
                       💰 ₹{" "}

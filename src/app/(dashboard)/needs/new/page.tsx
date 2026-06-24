@@ -48,6 +48,14 @@ export default function NewNeedPage() {
       "area"
     ) as string;
 
+    const location = formData.get(
+      "location"
+    ) as string;
+
+    const configuration = formData.get(
+      "configuration"
+    ) as string;
+
     const budget = Number(
       formData.get("budget") || 0
     );
@@ -57,27 +65,31 @@ export default function NewNeedPage() {
     ) as string;
     
     console.log({
-    client_name,
-    mobile,
-    property_type,
-    purpose,
-    area,
-    budget,
-    notes,
+      client_name,
+      mobile,
+      property_type,
+      location,
+      purpose,
+      configuration,
+      area,
+      budget,
+      notes,
     });
 
     console.log("BROKER:", broker.profile.id);
     const { data, error } = await supabase
     .from("requirements")
     .insert({
-        user_id: broker.profile.id,
-        client_name,
-        mobile,
-        property_type,
-        purpose,
-        area,
-        budget,
-        notes,
+      user_id: broker.profile.id,
+      client_name,
+      mobile,
+      property_type,
+      location,
+      purpose,
+      configuration,
+      area,
+      budget,
+      notes,
     } as any)
     .select();
 
