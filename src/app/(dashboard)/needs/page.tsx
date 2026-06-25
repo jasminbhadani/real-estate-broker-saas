@@ -69,9 +69,44 @@ export default async function NeedsPage({
   }
 
   const { data: requirements, error } =
-    await query.order("created_at", {
-      ascending: false,
-    });
+      await query.order("created_at", {
+        ascending: false,
+      });
+
+    const { data: properties } =
+      await supabase
+        .from("properties")
+        .select(
+          "property_type,purpose,status,deleted_at"
+        )
+        .eq("user_id", broker.profile.id)
+        .is("deleted_at", null);
+
+    const requirementsWithCounts =
+      (requirements ?? []).map(
+        (requirement: any) => {
+          const matchingPurpose =
+            requirement.purpose === "buy"
+              ? "sell"
+              : requirement.purpose;
+
+          const matchCount =
+            (properties ?? []).filter(
+              (property: any) =>
+                property.property_type ===
+                  requirement.property_type &&
+                property.purpose ===
+                  matchingPurpose &&
+                property.status ===
+                  "available"
+            ).length;
+
+          return {
+            ...requirement,
+            matchCount,
+          };
+        }
+      );
 
   if (error) {
     console.error(
@@ -234,7 +269,7 @@ export default async function NeedsPage({
                 : ""
             }`}
           >
-            Sell
+            Lease
           </Link>
         </div>
       </form>
@@ -258,7 +293,7 @@ export default async function NeedsPage({
         </div>
       ) : (
         <div className="space-y-3">
-          {requirements.map(
+          {requirementsWithCounts.map(
               (requirement: any) => (
                 <div
                   key={requirement.id}
@@ -313,6 +348,16 @@ export default async function NeedsPage({
                         requirement.budget ?? 0
                       ).toLocaleString("en-IN")}
                     </div>
+
+                    {requirement.matchCount > 0 && (
+                      <div className="mt-2 text-sm font-medium text-green-600">
+                        🎯 {requirement.matchCount} matching
+                        {requirement.matchCount === 1
+                          ? " property"
+                          : " properties"}
+                      </div>
+                    )}
+                    
                   </Link>
 
                   <div className="mt-4 grid grid-cols-3 gap-2">

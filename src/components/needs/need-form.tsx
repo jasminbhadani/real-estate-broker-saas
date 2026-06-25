@@ -8,7 +8,7 @@ type NeedFormProps = {
       | "office"
       | "shop"
       | "warehouse";
-    purpose?: "buy" | "rent" | "sell";
+    purpose?: "buy" | "rent" | "lease";
     area?: string;
     location?: string;
     configuration?: string;
@@ -24,34 +24,43 @@ export function NeedForm({
 }: NeedFormProps) {
   return (
     <form action={action} className="space-y-4">
+
+      {/* Client Name */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Client Name
+          Client Name *
         </label>
 
         <input
           name="client_name"
           required
           defaultValue={defaultValues?.client_name}
+          placeholder="e.g. Jignesh Patel"
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>
 
+      {/* Mobile */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Mobile
+          Mobile *
         </label>
 
         <input
           name="mobile"
+          required
+          pattern="[0-9]{10}"
+          maxLength={10}
           defaultValue={defaultValues?.mobile}
+          placeholder="e.g. 9876543210"
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>
 
+      {/* Property Type */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Property Type
+          Property Type *
         </label>
 
         <select
@@ -88,22 +97,10 @@ export function NeedForm({
         </select>
       </div>
 
+      {/* Purpose */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Location
-        </label>
-
-        <input
-          name="location"
-          defaultValue={defaultValues?.location}
-          placeholder="e.g. Satellite, Bopal, Gota"
-          className="w-full rounded-xl border px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium">
-          Purpose
+          Purpose *
         </label>
 
         <select
@@ -126,12 +123,44 @@ export function NeedForm({
             Rent
           </option>
 
-          <option value="sell">
-            Sell
+          <option value="lease">
+            Lease
           </option>
         </select>
       </div>
-      
+
+      {/* Location */}
+      <div>
+        <label className="mb-1 block text-sm font-medium">
+          Location *
+        </label>
+
+        <input
+          name="location"
+          required
+          defaultValue={defaultValues?.location}
+          placeholder="e.g. Satellite, Bopal, Gota"
+          className="w-full rounded-xl border px-3 py-2"
+        />
+      </div>
+
+      {/* Budget */}
+      <div>
+        <label className="mb-1 block text-sm font-medium">
+          Budget *
+        </label>
+
+        <input
+          type="number"
+          name="budget"
+          required
+          defaultValue={defaultValues?.budget}
+          placeholder="e.g. 8500000"
+          className="w-full rounded-xl border px-3 py-2"
+        />
+      </div>
+
+      {/* Configuration */}
       <div>
         <label className="mb-1 block text-sm font-medium">
           Configuration
@@ -140,36 +169,26 @@ export function NeedForm({
         <input
           name="configuration"
           defaultValue={defaultValues?.configuration}
-          placeholder="e.g. 2 BHK, 3 BHK, Commercial Plot"
+          placeholder="e.g. 2 BHK, 3 BHK, Furnished"
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>
 
+      {/* Area */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Area
+          Area (Sq. Ft.)
         </label>
 
         <input
           name="area"
           defaultValue={defaultValues?.area}
+          placeholder="e.g. 1200 sq.ft."
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">
-          Budget
-        </label>
-
-        <input
-          type="number"
-          name="budget"
-          defaultValue={defaultValues?.budget}
-          className="w-full rounded-xl border px-3 py-2"
-        />
-      </div>
-
+      {/* Notes */}
       <div>
         <label className="mb-1 block text-sm font-medium">
           Notes
@@ -179,6 +198,7 @@ export function NeedForm({
           name="notes"
           rows={4}
           defaultValue={defaultValues?.notes}
+          placeholder="Additional details..."
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>

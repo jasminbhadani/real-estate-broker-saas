@@ -12,6 +12,7 @@ interface PropertyFormProps {
   property?: {
     id: string;
     property_type: string;
+    configuration: string | null;
     location: string;
     area_value: number | null;
     price: number | null;
@@ -34,81 +35,186 @@ export function PropertyForm({
       className="space-y-4"
     >
       {/* Property Type */}
-      <select
-        name="property_type"
-        className="w-full rounded-md border p-3"
-        defaultValue={property?.property_type ?? "plot"}
-      >
-        <option value="plot">Plot</option>
-        <option value="flat">Flat</option>
-        <option value="office">Office</option>
-        <option value="shop">Shop</option>
-        <option value="warehouse">Warehouse</option>
-      </select>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Property Type *
+        </label>
+
+        <select
+          name="property_type"
+          required
+          className="w-full rounded-md border p-3"
+          defaultValue={
+            property?.property_type ?? "plot"
+          }
+        >
+          <option value="plot">Plot</option>
+          <option value="flat">Flat</option>
+          <option value="office">Office</option>
+          <option value="shop">Shop</option>
+          <option value="warehouse">
+            Warehouse
+          </option>
+        </select>
+      </div>
 
       {/* Purpose */}
-      <select
-        name="purpose"
-        className="w-full rounded-md border p-3"
-        defaultValue={property?.purpose ?? "sell"}
-      >
-        <option value="sell">
-          For Sale
-        </option>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Purpose *
+        </label>
 
-        <option value="rent">
-          For Rent
-        </option>
+        <select
+          name="purpose"
+          required
+          className="w-full rounded-md border p-3"
+          defaultValue={
+            property?.purpose ?? "sell"
+          }
+        >
+          <option value="sell">
+            For Sell
+          </option>
 
-        <option value="lease">
-          For Lease
-        </option>
-      </select>
+          <option value="rent">
+            For Rent
+          </option>
+
+          <option value="lease">
+            For Lease
+          </option>
+        </select>
+      </div>
 
       {/* Location */}
-      <Input
-        name="location"
-        placeholder="Location (e.g. Shela)"
-        defaultValue={property?.location ?? ""}
-      />
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Location *
+        </label>
 
-      {/* Area */}
-      <Input
-        name="area"
-        type="number"
-        placeholder="Area (e.g. 2000)"
-        defaultValue={property?.area_value ?? ""}
-      />
+        <Input
+          name="location"
+          required
+          placeholder="e.g. Shela"
+          defaultValue={property?.location ?? ""}
+          onInvalid={(e) =>
+            e.currentTarget.setCustomValidity(
+              "Location is required"
+            )
+          }
+          onInput={(e) =>
+            e.currentTarget.setCustomValidity("")
+          }
+        />
+      </div>
 
       {/* Price */}
-      <Input
-        name="price"
-        type="number"
-        placeholder="Price"
-        defaultValue={property?.price ?? ""}
-      />
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Price *
+        </label>
+
+        <Input
+          name="price"
+          type="number"
+          required
+          placeholder="e.g. 8500000"
+          defaultValue={property?.price ?? ""}
+          onInvalid={(e) =>
+            e.currentTarget.setCustomValidity(
+              "Price is required"
+            )
+          }
+          onInput={(e) =>
+            e.currentTarget.setCustomValidity("")
+          }
+        />
+      </div>
 
       {/* Status */}
-      <select
-        name="status"
-        className="w-full rounded-md border p-3"
-        defaultValue={property?.status ?? "available"}
-      >
-        <option value="available">Available</option>
-        <option value="sold">Sold</option>
-        <option value="rented">Rented</option>
-      </select>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Status *
+        </label>
 
+        <select
+          name="status"
+          required
+          className="w-full rounded-md border p-3"
+          defaultValue={
+            property?.status ??
+            "available"
+          }
+        >
+          <option value="available">
+            Available
+          </option>
+
+          <option value="sold">
+            Sold
+          </option>
+
+          <option value="rented">
+            Rented
+          </option>
+        </select>
+      </div>
+      
+      {/* Configuration */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Configuration
+        </label>
+
+        <Input
+          name="configuration"
+          placeholder="e.g. 3 BHK, Furnished, Commercial Plot"
+          defaultValue={
+            property?.configuration ?? ""
+          }
+        />
+      </div>
+
+      {/* Area */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Area (Sq. Ft.)
+        </label>
+
+        <Input
+          name="area"
+          type="number"
+          placeholder="e.g. 2000 sq.ft."
+          defaultValue={
+            property?.area_value ?? ""
+          }
+        />
+      </div>
+
+      
       {/* Notes */}
-      <Textarea
-        name="notes"
-        placeholder="Notes"
-        rows={4}
-        defaultValue={property?.notes ?? ""}
-      />
+      <div className="space-y-2">
+        <label className="text-sm font-medium">
+          Notes
+        </label>
 
-      <Button type="submit" className="w-full">
-        {property ? "Update Property" : "Save Property"}
+        <Textarea
+          name="notes"
+          placeholder="Additional details..."
+          rows={4}
+          defaultValue={
+            property?.notes ?? ""
+          }
+        />
+      </div>
+
+      <Button
+        type="submit"
+        className="w-full"
+      >
+        {property
+          ? "Update Property"
+          : "Save Property"}
       </Button>
     </form>
   );

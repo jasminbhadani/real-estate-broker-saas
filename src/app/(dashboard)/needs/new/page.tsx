@@ -10,98 +10,139 @@ export default function NewNeedPage() {
   ) {
     "use server";
 
-    console.log("CREATE NEED STARTED");
-
-    const broker = await getCurrentBroker();
+    const broker =
+      await getCurrentBroker();
 
     if (!broker) {
-      return;
+      throw new Error(
+        "Unauthorized"
+      );
     }
 
-    const supabase = await createClient();
+    const supabase =
+      await createClient();
 
-    const client_name = formData.get(
-      "client_name"
-    ) as string;
+    const client_name = String(
+      formData.get(
+        "client_name"
+      ) ?? ""
+    );
 
-    const mobile = formData.get(
-      "mobile"
-    ) as string;
+    const mobile = String(
+      formData.get("mobile") ?? ""
+    );
 
-    const property_type = formData.get(
+    const property_type =
+      formData.get(
         "property_type"
-        ) as
+      ) as
         | "plot"
         | "flat"
         | "office"
         | "shop"
         | "warehouse";
 
-    const purpose = formData.get(
+    const purpose =
+      formData.get(
         "purpose"
-        ) as
+      ) as
         | "buy"
         | "rent"
-        | "sell";
+        | "lease";
 
-    const area = formData.get(
-      "area"
-    ) as string;
+    const area = String(
+      formData.get("area") ?? ""
+    );
 
-    const location = formData.get(
-      "location"
-    ) as string;
+    const location = String(
+      formData.get("location") ?? ""
+    );
 
-    const configuration = formData.get(
-      "configuration"
-    ) as string;
+    const configuration = String(
+      formData.get(
+        "configuration"
+      ) ?? ""
+    );
 
     const budget = Number(
       formData.get("budget") || 0
     );
 
-    const notes = formData.get(
-      "notes"
-    ) as string;
-    
-    console.log({
-      client_name,
-      mobile,
-      property_type,
-      location,
-      purpose,
-      configuration,
-      area,
-      budget,
-      notes,
-    });
+    const notes = String(
+      formData.get("notes") ?? ""
+    );
 
-    console.log("BROKER:", broker.profile.id);
-    const { data, error } = await supabase
-    .from("requirements")
-    .insert({
-      user_id: broker.profile.id,
-      client_name,
-      mobile,
-      property_type,
-      location,
-      purpose,
-      configuration,
-      area,
-      budget,
-      notes,
-    } as any)
-    .select();
+    // Validation
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
+    if (!client_name.trim()) {
+      throw new Error(
+        "Client name is required"
+      );
+    }
+
+    if (!mobile.trim()) {
+      throw new Error(
+        "Mobile number is required"
+      );
+    }
+
+    if (!property_type) {
+      throw new Error(
+        "Property type is required"
+      );
+    }
+
+    if (!purpose) {
+      throw new Error(
+        "Purpose is required"
+      );
+    }
+
+    if (!location.trim()) {
+      throw new Error(
+        "Location is required"
+      );
+    }
+
+    if (!budget) {
+      throw new Error(
+        "Budget is required"
+      );
+    }
+
+    const { error } =
+      await supabase
+        .from("requirements")
+        .insert({
+          user_id:
+            broker.profile.id,
+          client_name:
+            client_name.trim(),
+          mobile:
+            mobile.trim(),
+          property_type,
+          location:
+            location.trim(),
+          purpose,
+          configuration:
+            configuration.trim() ||
+            null,
+          area:
+            area.trim() || null,
+          budget,
+          notes:
+            notes.trim() || null,
+        } as any);
 
     if (error) {
       console.error(
         "Create need error:",
         error
       );
-      return;
+
+      throw new Error(
+        error.message
+      );
     }
 
     redirect("/needs");

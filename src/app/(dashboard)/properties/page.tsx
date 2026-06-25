@@ -51,9 +51,8 @@ export default async function PropertiesPage({
     .is("deleted_at", null);
 
   if (search) {
-    query = query.ilike(
-      "location",
-      `%${search}%`
+    query = query.or(
+      `location.ilike.%${search}%,configuration.ilike.%${search}%`
     );
   }
 
@@ -82,6 +81,39 @@ export default async function PropertiesPage({
     await query.order("created_at", {
       ascending: false,
     });
+
+  const { data: requirements } =
+    await supabase
+      .from("requirements")
+      .select(
+        "property_type,purpose,deleted_at"
+      )
+      .eq("user_id", broker.profile.id)
+      .is("deleted_at", null);
+
+  const propertiesWithCounts =
+    (properties ?? []).map(
+      (property: any) => {
+        const matchingPurpose =
+          property.purpose === "sell"
+            ? "buy"
+            : property.purpose;
+
+        const matchCount =
+          (requirements ?? []).filter(
+            (requirement: any) =>
+              requirement.property_type ===
+                property.property_type &&
+              requirement.purpose ===
+                matchingPurpose
+          ).length;
+
+        return {
+          ...property,
+          matchCount,
+        };
+      }
+    );
 
   if (error) {
     console.error(
@@ -216,7 +248,7 @@ export default async function PropertiesPage({
                 : ""
             }`}
           >
-            Sale
+            Sell
           </Link>
 
           <Link
@@ -286,7 +318,8 @@ export default async function PropertiesPage({
         </div>
       ) : (
         <div className="space-y-3">
-          {properties.map((property) => (
+          {propertiesWithCounts.map(
+            (property: any) => (
             <Link
               key={property.id}
               href={`/properties/${property.id}`}
@@ -300,7 +333,7 @@ export default async function PropertiesPage({
                     {" "}
                     •{" "}
                     {property.purpose === "sell"
-                      ? "For Sale"
+                      ? "For Sell"
                       : property.purpose ===
                         "rent"
                       ? "For Rent"
@@ -313,6 +346,11 @@ export default async function PropertiesPage({
                 📍 {property.location}
               </div>
 
+              {property.configuration && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  🏡 {property.configuration}
+                </div>
+              )}
               <div className="mt-2 text-base font-semibold">
                 💰 ₹{" "}
                 {property.price?.toLocaleString(
@@ -320,10 +358,22 @@ export default async function PropertiesPage({
                 )}
               </div>
 
-              <div className="text-sm">
-                📐 {property.area_value}{" "}
-                {property.area_unit}
-              </div>
+              {property.area_value != null && (
+                <p className="text-sm">
+                  📐 {Number(
+                    property.area_value
+                  ).toLocaleString("en-IN")} sqft
+                </p>
+              )}
+
+              {property.matchCount > 0 && (
+                <div className="mt-2 text-sm font-medium text-green-600">
+                  🎯 {property.matchCount} matching
+                  {property.matchCount === 1
+                    ? " need"
+                    : " needs"}
+                </div>
+              )}
 
               <div className="mt-2">
                 <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-700 capitalize">

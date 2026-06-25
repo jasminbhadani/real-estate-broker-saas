@@ -34,6 +34,109 @@ export default async function PropertyDetailPage({
     notFound();
   }
 
+  const matchingPurpose =
+  property.purpose === "sell"
+    ? "buy"
+    : property.purpose ?? "";
+
+  const { data: candidateRequirements } =
+    await supabase
+      .from("requirements")
+      .select("*")
+      .eq("user_id", broker.profile.id)
+      .eq(
+        "property_type",
+        property.property_type
+      )
+      .eq(
+        "purpose",
+        matchingPurpose
+      )
+      .is("deleted_at", null)
+      .gte(
+        "budget",
+        property.price ?? 0
+      );
+
+      const matchingRequirements =
+      (candidateRequirements ?? [])
+        .map((requirement) => {
+          let score = 0;
+
+          // mandatory matches
+          score += 50;
+          score += 30;
+
+          // configuration exact match
+          if (
+            property.configuration &&
+            requirement.configuration &&
+            property.configuration
+              .trim()
+              .toLowerCase() ===
+              requirement.configuration
+                .trim()
+                .toLowerCase()
+          ) {
+            score += 20;
+          }
+
+      // location exact match
+      if (
+        property.location &&
+        requirement.location &&
+        property.location
+          .trim()
+          .toLowerCase() ===
+          requirement.location
+            .trim()
+            .toLowerCase()
+      ) {
+        score += 15;
+      }
+
+      // partial location
+      else if (
+        property.location &&
+        requirement.location &&
+        (
+          property.location
+            .toLowerCase()
+            .includes(
+              requirement.location.toLowerCase()
+            ) ||
+          requirement.location
+            .toLowerCase()
+            .includes(
+              property.location.toLowerCase()
+            )
+        )
+      ) {
+        score += 10;
+      }
+
+      const budget = Number(
+        requirement.budget ?? 0
+      );
+
+      const price = Number(
+        property.price ?? 0
+      );
+
+      if (
+        budget > 0 &&
+        Math.abs(budget - price) <=
+          budget * 0.1
+      ) {
+        score += 5;
+      }
+
+      return {
+        ...requirement,
+        score,
+      };
+    })
+    .sort((a, b) => b.score - a.score);
 
 return (
   <div className="w-full space-y-4 pb-24">
@@ -66,6 +169,18 @@ return (
           </p>
         </div>
 
+        {property.configuration?.trim() && (
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Configuration
+            </p>
+
+            <p className="font-medium">
+              🏡 {property.configuration}
+            </p>
+          </div>
+        )}
+
         <div>
           <p className="text-sm text-muted-foreground">
             Area
@@ -85,7 +200,7 @@ return (
           <p className="font-medium">
             🏷{" "}
             {property.purpose === "sell"
-              ? "For Sale"
+              ? "For Sell"
               : property.purpose === "rent"
               ? "For Rent"
               : property.purpose === "lease"
@@ -156,6 +271,51 @@ return (
       </div>
     </div>
 
+    {matchingRequirements.length > 0 && (
+      <div className="rounded-2xl border bg-card p-5">
+        <h2 className="font-semibold">
+          Matching Requirements
+        </h2>
+
+        <p className="text-sm text-muted-foreground">
+          {matchingRequirements.length} matches found
+        </p>
+
+        <div className="mt-4 space-y-3">
+          {matchingRequirements.map(
+            (requirement) => (
+              <Link
+                key={requirement.id}
+                href={`/needs/${requirement.id}`}
+                className="block rounded-xl border p-4"
+              >
+                <div className="font-medium">
+                  👤{" "}
+                  {requirement.client_name ||
+                    "Unknown Client"}
+                </div>
+
+                <div className="mt-2 text-sm text-muted-foreground">
+                  📱 {requirement.mobile}
+                </div>
+
+                <div className="mt-1 text-sm">
+                  📍 {requirement.location}
+                </div>
+
+                <div className="mt-1 text-sm">
+                  💰 ₹{" "}
+                  {Number(
+                    requirement.budget ?? 0
+                  ).toLocaleString("en-IN")}
+                </div>
+              </Link>
+            )
+          )}
+        </div>
+      </div>
+    )}
+
     <div className="grid grid-cols-2 gap-3">
       <Link
         href={`/properties/${property.id}/edit`}
@@ -168,7 +328,11 @@ return (
         href={`https://wa.me/?text=${encodeURIComponent(
           `🏠 ${property.property_type}
 
-📍 ${property.location}
+      ${
+        property.configuration?.trim()
+          ? `🏡 ${property.configuration}\n\n`
+          : ""
+      }📍 ${property.location}
 
 📐 ${property.area_value} ${property.area_unit}
 

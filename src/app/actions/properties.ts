@@ -7,164 +7,295 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentBroker } from "@/lib/supabase/get-user";
 
 type PropertyType =
-| "plot"
-| "flat"
-| "office"
-| "shop"
-| "warehouse";
+  | "plot"
+  | "flat"
+  | "office"
+  | "shop"
+  | "warehouse";
 
 type PropertyStatus =
-| "available"
-| "sold"
-| "rented";
+  | "available"
+  | "sold"
+  | "rented";
 
-export async function createProperty(formData: FormData) {
-const broker = await getCurrentBroker();
+export async function createProperty(
+  formData: FormData
+) {
+  const broker =
+    await getCurrentBroker();
 
-if (!broker) {
-throw new Error("Unauthorized");
-}
+  if (!broker) {
+    throw new Error("Unauthorized");
+  }
 
-const supabase = await createClient();
+  const supabase =
+    await createClient();
 
-const property_type = formData.get(
-"property_type"
-) as PropertyType;
+  const property_type =
+    formData.get(
+      "property_type"
+    ) as PropertyType;
 
-const location = formData.get(
-"location"
-) as string;
+  const location = String(
+    formData.get("location") ?? ""
+  );
 
-const area = formData.get(
-"area"
-) as string;
+  const configuration = String(
+    formData.get(
+      "configuration"
+    ) ?? ""
+  );
 
-const price = formData.get("price");
+  const area = String(
+    formData.get("area") ?? ""
+  );
 
-const status = formData.get(
-"status"
-) as PropertyStatus;
+  const price = formData.get("price");
 
-const notes = formData.get(
-"notes"
-) as string;
+  const status = formData.get(
+    "status"
+  ) as PropertyStatus;
 
-const purpose = String(
-  formData.get("purpose") ?? ""
-);
+  const notes = String(
+    formData.get("notes") ?? ""
+  );
 
-const { error } = await supabase
-    .from("properties")
-    .insert({
-    user_id: broker.profile.id,
-    property_type,
-    location,
-    purpose,
-    area_value: area ? Number(area) : null,
-    area_unit: "sqft",
-    price: price ? Number(price) : null,
-    status,
-    notes,
-});
+  const purpose = String(
+    formData.get("purpose") ?? ""
+  );
 
-if (error) {
-console.error("Create property error:", error);
-throw new Error(error.message);
-}
+  // Validation
+  if (!location.trim()) {
+    throw new Error(
+      "Location is required"
+    );
+  }
 
-revalidatePath("/properties");
-revalidatePath("/dashboard");
+  if (!price) {
+    throw new Error(
+      "Price is required"
+    );
+  }
 
-redirect("/properties");
+  if (!purpose) {
+    throw new Error(
+      "Purpose is required"
+    );
+  }
+
+  if (!status) {
+    throw new Error(
+      "Status is required"
+    );
+  }
+
+  const { error } =
+    await supabase
+      .from("properties")
+      .insert({
+        user_id:
+          broker.profile.id,
+        property_type,
+        location:
+          location.trim(),
+        configuration:
+          configuration.trim() ||
+          null,
+        purpose,
+        area_value: area
+          ? Number(area)
+          : null,
+        area_unit: "sqft",
+        price: Number(price),
+        status,
+        notes:
+          notes.trim() || null,
+      });
+
+  if (error) {
+    console.error(
+      "Create property error:",
+      error
+    );
+
+    throw new Error(
+      error.message
+    );
+  }
+
+  revalidatePath(
+    "/properties"
+  );
+  revalidatePath(
+    "/dashboard"
+  );
+
+  redirect("/properties");
 }
 
 export async function updateProperty(
-id: string,
-formData: FormData
+  id: string,
+  formData: FormData
 ) {
-const broker = await getCurrentBroker();
+  const broker =
+    await getCurrentBroker();
 
-if (!broker) {
-throw new Error("Unauthorized");
+  if (!broker) {
+    throw new Error("Unauthorized");
+  }
+
+  const supabase =
+    await createClient();
+
+  const property_type =
+    formData.get(
+      "property_type"
+    ) as PropertyType;
+
+  const location = String(
+    formData.get("location") ?? ""
+  );
+
+  const configuration = String(
+    formData.get(
+      "configuration"
+    ) ?? ""
+  );
+
+  const area = String(
+    formData.get("area") ?? ""
+  );
+
+  const price = formData.get("price");
+
+  const status = formData.get(
+    "status"
+  ) as PropertyStatus;
+
+  const notes = String(
+    formData.get("notes") ?? ""
+  );
+
+  const purpose = String(
+    formData.get("purpose") ?? ""
+  );
+
+  // Validation
+  if (!location.trim()) {
+    throw new Error(
+      "Location is required"
+    );
+  }
+
+  if (!price) {
+    throw new Error(
+      "Price is required"
+    );
+  }
+
+  if (!purpose) {
+    throw new Error(
+      "Purpose is required"
+    );
+  }
+
+  if (!status) {
+    throw new Error(
+      "Status is required"
+    );
+  }
+
+  const { error } =
+    await supabase
+      .from("properties")
+      .update({
+        property_type,
+        location:
+          location.trim(),
+        configuration:
+          configuration.trim() ||
+          null,
+        area_value: area
+          ? Number(area)
+          : null,
+        price: Number(price),
+        status,
+        purpose,
+        notes:
+          notes.trim() || null,
+      })
+      .eq("id", id)
+      .eq(
+        "user_id",
+        broker.profile.id
+      );
+
+  if (error) {
+    console.error(
+      "Update property error:",
+      error
+    );
+
+    throw new Error(
+      error.message
+    );
+  }
+
+  revalidatePath(
+    "/properties"
+  );
+  revalidatePath(
+    `/properties/${id}`
+  );
+
+  redirect(
+    `/properties/${id}`
+  );
 }
 
-const supabase = await createClient();
+export async function archiveProperty(
+  id: string
+) {
+  const broker =
+    await getCurrentBroker();
 
-const property_type = formData.get(
-"property_type"
-) as PropertyType;
+  if (!broker) {
+    throw new Error("Unauthorized");
+  }
 
-const location = formData.get(
-"location"
-) as string;
+  const supabase =
+    await createClient();
 
-const area = formData.get(
-"area"
-) as string;
+  const { error } =
+    await supabase
+      .from("properties")
+      .update({
+        deleted_at:
+          new Date().toISOString(),
+      })
+      .eq("id", id)
+      .eq(
+        "user_id",
+        broker.profile.id
+      );
 
-const price = formData.get("price");
+  if (error) {
+    console.error(
+      "Archive property error:",
+      error
+    );
 
-const status = formData.get(
-"status"
-) as PropertyStatus;
+    throw new Error(
+      error.message
+    );
+  }
 
-const notes = formData.get(
-"notes"
-) as string;
+  revalidatePath(
+    "/properties"
+  );
+  revalidatePath(
+    "/dashboard"
+  );
 
-const purpose = String(
-  formData.get("purpose") ?? ""
-);
-
-const { error } = await supabase
-.from("properties")
-.update({
-property_type,
-location,
-area_value: area ? Number(area) : null,
-price: price ? Number(price) : null,
-status,
-purpose,
-notes,
-})
-.eq("id", id)
-.eq("user_id", broker.profile.id);
-
-if (error) {
-console.error("Update property error:", error);
-throw new Error(error.message);
-}
-
-revalidatePath("/properties");
-revalidatePath(`/properties/${id}`);
-
-redirect(`/properties/${id}`);
-}
-
-export async function archiveProperty(id: string) {
-const broker = await getCurrentBroker();
-
-if (!broker) {
-throw new Error("Unauthorized");
-}
-
-const supabase = await createClient();
-
-const { error } = await supabase
-.from("properties")
-.update({
-deleted_at: new Date().toISOString(),
-})
-.eq("id", id)
-.eq("user_id", broker.profile.id);
-
-if (error) {
-console.error("Archive property error:", error);
-throw new Error(error.message);
-}
-
-revalidatePath("/properties");
-revalidatePath("/dashboard");
-
-redirect("/properties");
+  redirect("/properties");
 }

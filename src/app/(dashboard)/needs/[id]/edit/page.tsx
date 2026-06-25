@@ -11,7 +11,8 @@ export default async function EditNeedPage({
     id: string;
   }>;
 }) {
-  const broker = await getCurrentBroker();
+  const broker =
+    await getCurrentBroker();
 
   if (!broker) {
     return null;
@@ -19,14 +20,19 @@ export default async function EditNeedPage({
 
   const { id } = await params;
 
-  const supabase = await createClient();
+  const supabase =
+    await createClient();
 
-  const { data: requirement } = await supabase
-    .from("requirements")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", broker.profile.id)
-    .single();
+  const { data: requirement } =
+    await supabase
+      .from("requirements")
+      .select("*")
+      .eq("id", id)
+      .eq(
+        "user_id",
+        broker.profile.id
+      )
+      .single();
 
   if (!requirement) {
     return (
@@ -41,72 +47,142 @@ export default async function EditNeedPage({
   ) {
     "use server";
 
-    const broker = await getCurrentBroker();
+    const broker =
+      await getCurrentBroker();
 
     if (!broker) {
-      return;
+      throw new Error(
+        "Unauthorized"
+      );
     }
 
-    const supabase = await createClient();
+    const supabase =
+      await createClient();
 
-    const client_name = formData.get(
-      "client_name"
-    ) as string;
+    const client_name = String(
+      formData.get(
+        "client_name"
+      ) ?? ""
+    );
 
-    const mobile = formData.get(
-      "mobile"
-    ) as string;
+    const mobile = String(
+      formData.get("mobile") ?? ""
+    );
 
-    const property_type = formData.get(
-      "property_type"
-    ) as string;
+    const property_type =
+      formData.get(
+        "property_type"
+      ) as
+        | "plot"
+        | "flat"
+        | "office"
+        | "shop"
+        | "warehouse";
 
-    const purpose = formData.get(
-      "purpose"
-    ) as string;
+    const purpose =
+      formData.get(
+        "purpose"
+      ) as
+        | "buy"
+        | "rent"
+        | "lease";
 
-    const area = formData.get(
-      "area"
-    ) as string;
+    const area = String(
+      formData.get("area") ?? ""
+    );
 
-    const location = formData.get(
-      "location"
-    ) as string;
+    const location = String(
+      formData.get("location") ?? ""
+    );
 
-    const configuration = formData.get(
-      "configuration"
-    ) as string;
+    const configuration = String(
+      formData.get(
+        "configuration"
+      ) ?? ""
+    );
 
     const budget = Number(
       formData.get("budget") || 0
     );
 
-    const notes = formData.get(
-      "notes"
-    ) as string;
+    const notes = String(
+      formData.get("notes") ?? ""
+    );
 
-    const { error } = await supabase
-      .from("requirements")
-      .update({
-        client_name,
-        mobile,
-        property_type,
-        location,
-        purpose,
-        configuration,
-        area,
-        budget,
-        notes,
-      } as any)
-      .eq("id", id)
-      .eq("user_id", broker.profile.id);
+    // Validation
+
+    if (!client_name.trim()) {
+      throw new Error(
+        "Client name is required"
+      );
+    }
+
+    if (!mobile.trim()) {
+      throw new Error(
+        "Mobile number is required"
+      );
+    }
+
+    if (!property_type) {
+      throw new Error(
+        "Property type is required"
+      );
+    }
+
+    if (!purpose) {
+      throw new Error(
+        "Purpose is required"
+      );
+    }
+
+    if (!location.trim()) {
+      throw new Error(
+        "Location is required"
+      );
+    }
+
+    if (!budget) {
+      throw new Error(
+        "Budget is required"
+      );
+    }
+
+    const { error } =
+      await supabase
+        .from("requirements")
+        .update({
+          client_name:
+            client_name.trim(),
+          mobile:
+            mobile.trim(),
+          property_type,
+          location:
+            location.trim(),
+          purpose,
+          configuration:
+            configuration.trim() ||
+            null,
+          area:
+            area.trim() || null,
+          budget,
+          notes:
+            notes.trim() || null,
+        } as any)
+        .eq("id", id)
+        .eq(
+          "user_id",
+          broker.profile.id
+        );
 
     if (error) {
       console.error(
         "Update need error:",
         error
       );
-      return;
+
+      throw new Error(
+        error.message
+      );
     }
 
     redirect(`/needs/${id}`);
@@ -122,17 +198,23 @@ export default async function EditNeedPage({
         action={updateNeed}
         defaultValues={{
           client_name:
-            requirement.client_name ?? "",
+            requirement.client_name ??
+            "",
           mobile:
-            requirement.mobile ?? "",
-          property_type: requirement.property_type ?? undefined,
+            requirement.mobile ??
+            "",
+          property_type:
+            requirement.property_type ??
+            undefined,
           location:
-            requirement.location ?? "",
+            requirement.location ??
+            "",
           purpose:
-            (requirement as any).purpose ??
-            "buy",          
+            (requirement as any)
+              .purpose ?? "buy",
           configuration:
-            requirement.configuration ?? "",
+            requirement.configuration ??
+            "",
           area:
             requirement.area ?? "",
           budget:

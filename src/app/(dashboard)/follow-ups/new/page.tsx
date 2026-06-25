@@ -88,7 +88,7 @@ export default async function NewFollowUpPage({
 
         <div>
           <label className="mb-1 block text-sm font-medium">
-            Follow-up Type
+            Follow-up Type *
           </label>
 
           <select
@@ -132,7 +132,7 @@ export default async function NewFollowUpPage({
 
         <div>
           <label className="mb-1 block text-sm font-medium">
-            Date
+            Date *
           </label>
 
           <input
@@ -145,7 +145,7 @@ export default async function NewFollowUpPage({
 
         <div>
           <label className="mb-1 block text-sm font-medium">
-            Time
+            Time *
           </label>
 
           <input
