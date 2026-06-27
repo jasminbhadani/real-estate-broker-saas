@@ -323,7 +323,7 @@ export default async function PropertiesPage({
             <Link
               key={property.id}
               href={`/properties/${property.id}`}
-              className="block rounded-xl border p-4 hover:bg-muted"
+              className="block rounded-xl border p-4 active:bg-muted"
             >
               <div className="font-semibold capitalize">
                 🏠 {property.property_type}
@@ -345,6 +345,18 @@ export default async function PropertiesPage({
               <div className="mt-2 text-sm text-muted-foreground">
                 📍 {property.location}
               </div>
+
+              {property.owner_name && (
+                <div className="mt-2 text-sm font-medium">
+                  👤 {property.owner_name}
+                </div>
+              )}
+
+              {property.owner_mobile && (
+                <div className="text-sm text-muted-foreground">
+                  📞 {property.owner_mobile}
+                </div>
+              )}
 
               {property.configuration && (
                 <div className="mt-2 text-sm text-muted-foreground">

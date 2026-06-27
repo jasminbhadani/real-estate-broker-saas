@@ -50,6 +50,19 @@ export default function NewNeedPage() {
         | "rent"
         | "lease";
 
+    const deal_status =
+      formData.get(
+        "deal_status"
+      ) as
+        | "new_inquiry"
+        | "properties_shared"
+        | "site_visit_planned"
+        | "site_visit_done"
+        | "negotiation"
+        | "token_received"
+        | "closed"
+        | "lost";
+
     const area = String(
       formData.get("area") ?? ""
     );
@@ -124,6 +137,9 @@ export default function NewNeedPage() {
           location:
             location.trim(),
           purpose,
+          deal_status:
+            deal_status ??
+            "new_inquiry",
           configuration:
             configuration.trim() ||
             null,

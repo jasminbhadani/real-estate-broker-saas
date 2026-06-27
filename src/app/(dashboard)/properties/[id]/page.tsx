@@ -159,90 +159,167 @@ return (
 
     <div className="w-full rounded-2xl border bg-card p-5">
       <div className="space-y-4">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Location
-          </p>
+        <div className="w-full rounded-2xl border bg-card p-5">
+          <div className="space-y-4">
 
-          <p className="font-medium">
-            📍 {property.location}
-          </p>
-        </div>
+            {/* Owner Information */}
+            <div className="rounded-xl border p-3">
+              <p className="mb-3 text-sm font-medium">
+                Owner Information
+              </p>
 
-        {property.configuration?.trim() && (
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Configuration
-            </p>
+              <div className="space-y-1.5">
+                <div className="font-medium">
+                  👤 {property.owner_name ?? "-"}
+                </div>
 
-            <p className="font-medium">
-              🏡 {property.configuration}
-            </p>
+                <div>
+                  📞 {property.owner_mobile ?? "-"}
+                </div>
+
+                {property.owner_alternate_mobile && (
+                  <div>
+                    📞 {property.owner_alternate_mobile}
+                  </div>
+                )}
+
+                {property.owner_type && (
+                  <div>
+                    🏢 {
+                      property.owner_type
+                        .charAt(0)
+                        .toUpperCase() +
+                      property.owner_type.slice(1)
+                    }
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <a
+                  href={`tel:${property.owner_mobile}`}
+                  className="flex h-10 items-center justify-center rounded-lg border"
+                >
+                  📞 Call
+                </a>
+
+                <a
+                  href={`https://wa.me/91${property.owner_mobile}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 items-center justify-center rounded-lg bg-green-600 text-white"
+                >
+                  💬 WhatsApp
+                </a>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Location
+              </p>
+
+              <p className="font-medium">
+                📍 {property.location}
+              </p>
+            </div>
+
+            {/* Purpose + Status */}
+            <div className="grid grid-cols-2 gap-4">
+
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Purpose
+                </p>
+
+                <p className="font-medium">
+                  🏷{" "}
+                  {property.purpose === "sell"
+                    ? "For Sell"
+                    : property.purpose === "rent"
+                    ? "For Rent"
+                    : property.purpose === "lease"
+                    ? "For Lease"
+                    : "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Status
+                </p>
+
+                <span className="inline-flex rounded-full bg-muted px-3 py-1 text-sm capitalize">
+                  {property.status}
+                </span>
+              </div>
+
+            </div>
+
+            {/* Configuration + Area */}
+            {(property.configuration?.trim() ||
+              property.area_value) && (
+              <div className="grid grid-cols-2 gap-4">
+
+                {property.configuration?.trim() && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Configuration
+                    </p>
+
+                    <p className="font-medium">
+                      🏡 {property.configuration}
+                    </p>
+                  </div>
+                )}
+
+                {property.area_value && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Area
+                    </p>
+
+                    <p className="font-medium">
+                      📐 {property.area_value}{" "}
+                      {property.area_unit}
+                    </p>
+                  </div>
+                )}
+
+              </div>
+            )}
+
+            {/* Price */}
+            <div className="py-2">
+              <p className="text-sm text-muted-foreground">
+                Price
+              </p>
+
+              <p className="text-3xl font-bold">
+                ₹{" "}
+                {Number(
+                  property.price ?? 0
+                ).toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            {/* Notes */}
+            {property.notes?.trim() && (
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Notes
+                </p>
+
+                <div className="mt-2 rounded-xl bg-muted p-3 text-sm">
+                  {property.notes}
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
-
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Area
-          </p>
-
-          <p className="font-medium">
-            📐 {property.area_value}{" "}
-            {property.area_unit}
-          </p>
         </div>
-
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Purpose
-          </p>
-
-          <p className="font-medium">
-            🏷{" "}
-            {property.purpose === "sell"
-              ? "For Sell"
-              : property.purpose === "rent"
-              ? "For Rent"
-              : property.purpose === "lease"
-              ? "For Lease"
-              : "-"}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Price
-          </p>
-
-          <p className="text-3xl font-bold">
-            ₹{" "}
-            {Number(
-              property.price ?? 0
-            ).toLocaleString("en-IN")}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Status
-          </p>
-
-          <span className="inline-flex rounded-full bg-muted px-3 py-1 text-sm capitalize">
-            {property.status}
-          </span>
-        </div>
-
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Notes
-          </p>
-
-          <div className="mt-2 rounded-xl bg-muted p-3 text-sm">
-            {property.notes?.trim()
-              ? property.notes
-              : "No notes added"}
-          </div>
-        </div>
+        
       </div>
     </div>
 
@@ -344,7 +421,7 @@ return (
         rel="noopener noreferrer"
         className="flex h-12 items-center justify-center rounded-xl bg-green-600 font-medium text-white"
       >
-        WhatsApp
+        Share Property
       </a>
     </div>
 

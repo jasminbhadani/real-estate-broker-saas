@@ -9,6 +9,15 @@ type NeedFormProps = {
       | "shop"
       | "warehouse";
     purpose?: "buy" | "rent" | "lease";
+    deal_status?:
+      | "new_inquiry"
+      | "properties_shared"
+      | "site_visit_planned"
+      | "site_visit_done"
+      | "negotiation"
+      | "token_received"
+      | "closed"
+      | "lost";
     area?: string;
     location?: string;
     configuration?: string;
@@ -56,6 +65,53 @@ export function NeedForm({
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>
+
+      {/* Deal Status */}
+        <div>
+          <label className="mb-1 block text-sm font-medium">
+            Deal Status
+          </label>
+
+          <select
+            name="deal_status"
+            defaultValue={
+              defaultValues?.deal_status ?? "new_inquiry"
+            }
+            className="w-full rounded-xl border px-3 py-2"
+          >
+            <option value="new_inquiry">
+              🟢 New Inquiry
+            </option>
+
+            <option value="properties_shared">
+              📤 Properties Shared
+            </option>
+
+            <option value="site_visit_planned">
+              📅 Site Visit Planned
+            </option>
+
+            <option value="site_visit_done">
+              🏠 Site Visit Done
+            </option>
+
+            <option value="negotiation">
+              🤝 Negotiation
+            </option>
+
+            <option value="token_received">
+              💰 Token Received
+            </option>
+
+            <option value="closed">
+              ✅ Closed
+            </option>
+
+            <option value="lost">
+              ❌ Lost
+            </option>
+          </select>
+        </div>
 
       {/* Property Type */}
       <div>

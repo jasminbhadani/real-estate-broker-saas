@@ -64,6 +64,24 @@ export async function createProperty(
     formData.get("purpose") ?? ""
   );
 
+  const owner_name = String(
+    formData.get("owner_name") ?? ""
+  );
+
+  const owner_mobile = String(
+    formData.get("owner_mobile") ?? ""
+  );
+
+  const owner_alternate_mobile = String(
+    formData.get(
+      "owner_alternate_mobile"
+    ) ?? ""
+  );
+
+  const owner_type = String(
+    formData.get("owner_type") ?? ""
+  );
+
   // Validation
   if (!location.trim()) {
     throw new Error(
@@ -89,6 +107,17 @@ export async function createProperty(
     );
   }
 
+  if (!owner_name.trim()) {
+  throw new Error(
+    "Owner name is required"
+  );
+}
+
+if (!owner_mobile.trim()) {
+  throw new Error(
+    "Owner mobile is required"
+  );
+}
   const { error } =
     await supabase
       .from("properties")
@@ -110,7 +139,20 @@ export async function createProperty(
         status,
         notes:
           notes.trim() || null,
-      });
+
+        owner_name:
+          owner_name.trim(),
+
+        owner_mobile:
+          owner_mobile.trim(),
+
+        owner_alternate_mobile:
+          owner_alternate_mobile.trim() ||
+          null,
+
+        owner_type:
+          owner_type.trim() || null,
+              });
 
   if (error) {
     console.error(
@@ -180,6 +222,24 @@ export async function updateProperty(
     formData.get("purpose") ?? ""
   );
 
+  const owner_name = String(
+    formData.get("owner_name") ?? ""
+  );
+
+  const owner_mobile = String(
+    formData.get("owner_mobile") ?? ""
+  );
+
+  const owner_alternate_mobile = String(
+    formData.get(
+      "owner_alternate_mobile"
+    ) ?? ""
+  );
+
+  const owner_type = String(
+    formData.get("owner_type") ?? ""
+  );
+
   // Validation
   if (!location.trim()) {
     throw new Error(
@@ -205,6 +265,18 @@ export async function updateProperty(
     );
   }
 
+  if (!owner_name.trim()) {
+    throw new Error(
+      "Owner name is required"
+    );
+  }
+
+  if (!owner_mobile.trim()) {
+    throw new Error(
+      "Owner mobile is required"
+    );
+  }
+
   const { error } =
     await supabase
       .from("properties")
@@ -223,6 +295,19 @@ export async function updateProperty(
         purpose,
         notes:
           notes.trim() || null,
+
+        owner_name:
+          owner_name.trim(),
+
+        owner_mobile:
+          owner_mobile.trim(),
+
+        owner_alternate_mobile:
+          owner_alternate_mobile.trim() ||
+          null,
+
+        owner_type:
+          owner_type.trim() || null,
       })
       .eq("id", id)
       .eq(

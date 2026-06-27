@@ -19,6 +19,11 @@ interface PropertyFormProps {
     purpose: string | null;
     status: string | null;
     notes: string | null;
+
+    owner_name: string | null;
+    owner_mobile: string | null;
+    owner_alternate_mobile: string | null;
+    owner_type: string | null;
   };
 }
 
@@ -34,57 +39,61 @@ export function PropertyForm({
       }
       className="space-y-4"
     >
-      {/* Property Type */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Property Type *
-        </label>
+      <div className="grid grid-cols-2 gap-3">
 
-        <select
-          name="property_type"
-          required
-          className="w-full rounded-md border p-3"
-          defaultValue={
-            property?.property_type ?? "plot"
-          }
-        >
-          <option value="plot">Plot</option>
-          <option value="flat">Flat</option>
-          <option value="office">Office</option>
-          <option value="shop">Shop</option>
-          <option value="warehouse">
-            Warehouse
-          </option>
-        </select>
-      </div>
+  {/* Property Type */}
+  <div className="space-y-2">
+    <label className="text-sm font-medium">
+      Property Type *
+    </label>
 
-      {/* Purpose */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Purpose *
-        </label>
+    <select
+      name="property_type"
+      required
+      className="w-full rounded-md border p-3"
+      defaultValue={
+        property?.property_type ?? "plot"
+      }
+    >
+      <option value="plot">Plot</option>
+      <option value="flat">Flat</option>
+      <option value="office">Office</option>
+      <option value="shop">Shop</option>
+      <option value="warehouse">
+        Warehouse
+      </option>
+    </select>
+  </div>
 
-        <select
-          name="purpose"
-          required
-          className="w-full rounded-md border p-3"
-          defaultValue={
-            property?.purpose ?? "sell"
-          }
-        >
-          <option value="sell">
-            For Sell
-          </option>
+  {/* Purpose */}
+  <div className="space-y-2">
+    <label className="text-sm font-medium">
+      Purpose *
+    </label>
 
-          <option value="rent">
-            For Rent
-          </option>
+    <select
+      name="purpose"
+      required
+      className="w-full rounded-md border p-3"
+      defaultValue={
+        property?.purpose ?? "sell"
+      }
+    >
+      <option value="sell">
+        For Sell
+      </option>
 
-          <option value="lease">
-            For Lease
-          </option>
-        </select>
-      </div>
+      <option value="rent">
+        For Rent
+      </option>
+
+      <option value="lease">
+        For Lease
+      </option>
+    </select>
+  </div>
+
+</div>
 
       {/* Location */}
       <div className="space-y-2">
@@ -108,56 +117,176 @@ export function PropertyForm({
         />
       </div>
 
-      {/* Price */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Price *
-        </label>
+      {/* Owner Information */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">
+          Owner Information
+        </h3>
 
-        <Input
-          name="price"
-          type="number"
-          required
-          placeholder="e.g. 8500000"
-          defaultValue={property?.price ?? ""}
-          onInvalid={(e) =>
-            e.currentTarget.setCustomValidity(
-              "Price is required"
-            )
-          }
-          onInput={(e) =>
-            e.currentTarget.setCustomValidity("")
-          }
-        />
+        {/* Owner Name */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Owner Name *
+          </label>
+
+          <Input
+            name="owner_name"
+            required
+            placeholder="e.g. Rajesh Patel"
+            defaultValue={
+              property?.owner_name ?? ""
+            }
+            onInvalid={(e) =>
+              e.currentTarget.setCustomValidity(
+                "Owner name is required"
+              )
+            }
+            onInput={(e) =>
+              e.currentTarget.setCustomValidity("")
+            }
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+
+          {/* Owner Mobile */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Owner Mobile *
+            </label>
+
+            <Input
+              name="owner_mobile"
+              type="tel"
+              required
+              placeholder="9876543210"
+              defaultValue={
+                property?.owner_mobile ?? ""
+              }
+              pattern="[0-9]{10}"
+              onInvalid={(e) =>
+                e.currentTarget.setCustomValidity(
+                  "Enter valid 10 digit mobile number"
+                )
+              }
+              onInput={(e) =>
+                e.currentTarget.setCustomValidity("")
+              }
+            />
+          </div>
+
+          {/* Owner Type */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Owner Type
+            </label>
+
+            <select
+              name="owner_type"
+              className="w-full rounded-md border p-3"
+              defaultValue={
+                property?.owner_type ?? "owner"
+              }
+            >
+              <option value="owner">
+                Owner
+              </option>
+
+              <option value="broker">
+                Broker
+              </option>
+
+              <option value="builder">
+                Builder
+              </option>
+
+              <option value="tenant">
+                Tenant
+              </option>
+
+              <option value="other">
+                Other
+              </option>
+            </select>
+          </div>
+
+        </div>
+
+        {/* Alternate Mobile */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Alternate Mobile
+          </label>
+
+          <Input
+            name="owner_alternate_mobile"
+            type="tel"
+            placeholder="Optional"
+            defaultValue={
+              property?.owner_alternate_mobile ??
+              ""
+            }
+          />
+        </div>
       </div>
+      
 
-      {/* Status */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Status *
-        </label>
+      <div className="grid grid-cols-2 gap-3">
 
-        <select
-          name="status"
-          required
-          className="w-full rounded-md border p-3"
-          defaultValue={
-            property?.status ??
-            "available"
-          }
-        >
-          <option value="available">
-            Available
-          </option>
+        {/* Price */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Price *
+          </label>
 
-          <option value="sold">
-            Sold
-          </option>
+          <Input
+            name="price"
+            type="number"
+            required
+            placeholder="8500000"
+            defaultValue={
+              property?.price ?? ""
+            }
+            onInvalid={(e) =>
+              e.currentTarget.setCustomValidity(
+                "Price is required"
+              )
+            }
+            onInput={(e) =>
+              e.currentTarget.setCustomValidity("")
+            }
+          />
+        </div>
 
-          <option value="rented">
-            Rented
-          </option>
-        </select>
+        {/* Status */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Status *
+          </label>
+
+          <select
+            name="status"
+            required
+            className="w-full rounded-md border p-3"
+            defaultValue={
+              property?.status ??
+              "available"
+            }
+          >
+            <option value="available">
+              Available
+            </option>
+
+            <option value="sold">
+              Sold
+            </option>
+
+            <option value="rented">
+              Rented
+            </option>
+          </select>
+        </div>
+
       </div>
       
       {/* Configuration */}

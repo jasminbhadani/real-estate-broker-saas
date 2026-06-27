@@ -11,7 +11,7 @@ export function StatsCards({
 }: StatsCardsProps) {
   const stats = [
     {
-      label: "Properties",
+      label: "Available Properties",
       value: propertiesCount,
       emoji: "🏠",
     },

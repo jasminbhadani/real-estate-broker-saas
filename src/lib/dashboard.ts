@@ -15,9 +15,10 @@ export async function getDashboardStats() {
     { count: followUpsTodayCount },
   ] = await Promise.all([
     supabase
-      .from("properties")
-      .select("*", { count: "exact", head: true })
-      .is("deleted_at", null),
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "available")
+    .is("deleted_at", null),
 
     supabase
       .from("requirements")

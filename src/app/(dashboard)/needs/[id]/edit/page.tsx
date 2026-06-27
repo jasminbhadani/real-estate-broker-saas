@@ -159,6 +159,9 @@ export default async function EditNeedPage({
           location:
             location.trim(),
           purpose,
+          deal_status:
+            formData.get("deal_status") ??
+            "new_inquiry",
           configuration:
             configuration.trim() ||
             null,
@@ -212,6 +215,11 @@ export default async function EditNeedPage({
           purpose:
             (requirement as any)
               .purpose ?? "buy",
+
+          deal_status:
+            (requirement as any)
+              .deal_status ??
+            "new_inquiry",
           configuration:
             requirement.configuration ??
             "",

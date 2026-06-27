@@ -3,6 +3,36 @@ import Link from "next/link";
 import { getCurrentBroker } from "@/lib/supabase/get-user";
 import { createClient } from "@/lib/supabase/server";
 
+function getDealStatusLabel(
+  status?: string | null
+) {
+  switch (status) {
+    case "properties_shared":
+      return "📤 Properties Shared";
+
+    case "site_visit_planned":
+      return "📅 Site Visit Planned";
+
+    case "site_visit_done":
+      return "🏠 Site Visit Done";
+
+    case "negotiation":
+      return "🤝 Negotiation";
+
+    case "token_received":
+      return "💰 Token Received";
+
+    case "closed":
+      return "✅ Closed";
+
+    case "lost":
+      return "❌ Lost";
+
+    default:
+      return "🟢 New Inquiry";
+  }
+}
+
 export default async function NeedsPage({
   searchParams,
 }: {
@@ -348,7 +378,13 @@ export default async function NeedsPage({
                         requirement.budget ?? 0
                       ).toLocaleString("en-IN")}
                     </div>
-
+                    
+                    <div className="mt-2 text-sm font-medium">
+                      {getDealStatusLabel(
+                        requirement.deal_status
+                      )}
+                    </div>
+                    
                     {requirement.matchCount > 0 && (
                       <div className="mt-2 text-sm font-medium text-green-600">
                         🎯 {requirement.matchCount} matching

@@ -22,7 +22,10 @@ export async function archiveNeed(
       deleted_at: new Date().toISOString(),
     })
     .eq("id", needId)
-    .eq("user_id", broker.profile.id);
+    .eq(
+      "user_id",
+      broker.profile.id
+    );
 
   if (error) {
     console.error(
@@ -33,4 +36,48 @@ export async function archiveNeed(
   }
 
   revalidatePath("/needs");
+}
+
+export async function updateDealStatus(
+  needId: string,
+  dealStatus: string
+) {
+  const broker =
+    await getCurrentBroker();
+
+  if (!broker) {
+    return;
+  }
+
+  const supabase =
+    await createClient();
+
+  const { error } =
+    await supabase
+      .from("requirements")
+      .update({
+        deal_status:
+          dealStatus,
+      })
+      .eq("id", needId)
+      .eq(
+        "user_id",
+        broker.profile.id
+      );
+
+  if (error) {
+    console.error(
+      "Update deal status error:",
+      error
+    );
+    return;
+  }
+
+  revalidatePath(
+    `/needs/${needId}`
+  );
+  revalidatePath("/needs");
+  revalidatePath(
+    "/dashboard"
+  );
 }
