@@ -307,13 +307,13 @@ export function PropertyForm({
       {/* Area */}
       <div className="space-y-2">
         <label className="text-sm font-medium">
-          Area (Sq. Ft.)
+          Area (Sq. Yards)
         </label>
 
         <Input
           name="area"
           type="number"
-          placeholder="e.g. 2000 sq.ft."
+          placeholder="e.g. 2000 sq.yards"
           defaultValue={
             property?.area_value ?? ""
           }

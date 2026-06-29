@@ -374,7 +374,7 @@ export default async function PropertiesPage({
                 <p className="text-sm">
                   📐 {Number(
                     property.area_value
-                  ).toLocaleString("en-IN")} sqft
+                  ).toLocaleString("en-IN")} sq yards
                 </p>
               )}
 

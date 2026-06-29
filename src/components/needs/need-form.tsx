@@ -233,13 +233,13 @@ export function NeedForm({
       {/* Area */}
       <div>
         <label className="mb-1 block text-sm font-medium">
-          Area (Sq. Ft.)
+          Area (Sq. Yards)
         </label>
 
         <input
           name="area"
           defaultValue={defaultValues?.area}
-          placeholder="e.g. 1200 sq.ft."
+          placeholder="e.g. 1200 sq.yards"
           className="w-full rounded-xl border px-3 py-2"
         />
       </div>

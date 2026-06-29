@@ -281,8 +281,7 @@ return (
                     </p>
 
                     <p className="font-medium">
-                      📐 {property.area_value}{" "}
-                      {property.area_unit}
+                      📐 {property.area_value} Sq. Yards
                     </p>
                   </div>
                 )}

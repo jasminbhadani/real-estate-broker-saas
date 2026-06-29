@@ -3,7 +3,7 @@ import {
   Building2,
   ClipboardList,
   Clock3,
-  User,
+  Wrench,
 } from "lucide-react";
 
 export const bottomNavItems = [
@@ -23,13 +23,13 @@ export const bottomNavItems = [
     icon: ClipboardList,
   },
   {
+    href: "/tools",
+    label: "Tools",
+    icon: Wrench,
+  },
+  {
     href: "/follow-ups",
     label: "Follow-ups",
     icon: Clock3,
-  },
-  {
-    href: "/profile",
-    label: "Profile",
-    icon: User,
   },
 ];
