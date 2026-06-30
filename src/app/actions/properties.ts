@@ -134,7 +134,7 @@ if (!owner_mobile.trim()) {
         area_value: area
           ? Number(area)
           : null,
-        area_unit: "sq yards",
+        area_unit: "sqyd",
         price: Number(price),
         status,
         notes:
