@@ -82,6 +82,42 @@ export default async function PropertiesPage({
       ascending: false,
     });
 
+  const propertyIds =
+      properties?.map(
+        (p) => p.id
+      ) ?? [];
+
+    const {
+      data: propertyImages,
+    } = await supabase
+      .from(
+        "property_images"
+      )
+      .select(
+        "property_id,image_url,is_cover"
+      )
+      .in(
+        "property_id",
+        propertyIds
+      );
+
+    const coverImages =
+      new Map(
+        (
+          propertyImages ?? []
+        )
+          .filter(
+            (img) =>
+              img.is_cover
+          )
+          .map(
+            (img) => [
+              img.property_id,
+              img.image_url,
+            ]
+          )
+      );
+
   const { data: requirements } =
     await supabase
       .from("requirements")
@@ -325,6 +361,17 @@ export default async function PropertiesPage({
               href={`/properties/${property.id}`}
               className="block rounded-xl border p-4 active:bg-muted"
             >
+              {coverImages.get(
+                property.id
+              ) && (
+                <img
+                  src={coverImages.get(
+                    property.id
+                  )}
+                  alt=""
+                  className="mb-3 h-40 w-full rounded-lg object-cover"
+                />
+              )}
               <div className="font-semibold capitalize">
                 🏠 {property.property_type}
 

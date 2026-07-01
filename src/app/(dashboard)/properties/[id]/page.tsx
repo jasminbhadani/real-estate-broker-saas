@@ -34,6 +34,31 @@ export default async function PropertyDetailPage({
     notFound();
   }
 
+  const {
+    data: propertyImages,
+  } = await supabase
+    .from(
+      "property_images"
+    )
+    .select("*")
+    .eq(
+      "property_id",
+      property.id
+    )
+    .order(
+      "sort_order",
+      {
+        ascending: true,
+      }
+    );
+
+  const coverImage =
+    propertyImages?.find(
+      (img) =>
+        img.is_cover
+    ) ??
+    propertyImages?.[0];
+
   const matchingPurpose =
   property.purpose === "sell"
     ? "buy"
@@ -138,6 +163,42 @@ export default async function PropertyDetailPage({
     })
     .sort((a, b) => b.score - a.score);
 
+const shareText = [
+  "━━━━━━━━━━━━━━",
+  `PROPERTY FOR ${property.purpose?.toUpperCase() ?? ""}`,
+  "━━━━━━━━━━━━━━",
+  "",
+
+  `Type: ${property.property_type ?? "-"}`,
+
+  property.configuration
+    ? `Configuration: ${property.configuration}`
+    : null,
+
+  property.location
+    ? `Location: ${property.location}`
+    : null,
+
+  property.area_value
+    ? `Area: ${property.area_value} ${property.area_unit ?? "sq yd"}`
+    : null,
+
+  property.price
+    ? `Price: ₹${Number(property.price).toLocaleString("en-IN")}`
+    : null,
+
+  property.status
+    ? `Status: ${property.status}`
+    : null,
+
+  "",
+
+  "Contact:",
+  property.owner_mobile ?? "",
+]
+  .filter(Boolean)
+  .join("\n");
+
 return (
   <div className="w-full space-y-4 pb-24">
     <Link
@@ -148,16 +209,70 @@ return (
     </Link>
 
     <div>
-      <h1 className="text-2xl font-bold capitalize">
-        🏠 {property.property_type}
-      </h1>
+  <h1 className="text-2xl font-bold capitalize">
+    🏠 {property.property_type}
+  </h1>
 
-      <p className="text-sm text-muted-foreground">
-        Property Details
-      </p>
+  <p className="text-sm text-muted-foreground">
+    Property Details
+  </p>
+</div>
+
+{/* Property Images */}
+{propertyImages &&
+  propertyImages.length >
+    0 && (
+    <div className="space-y-3">
+
+      {/* Cover Image */}
+      <div className="overflow-hidden rounded-2xl border">
+        <img
+          src={
+            coverImage?.image_url
+          }
+          alt="Property"
+          className="h-48 md:h-56 w-full object-cover"
+        />
+      </div>
+
+      {/* Thumbnail Strip */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {propertyImages
+          .filter(
+            (image) =>
+              !image.is_cover
+          )
+          .map(
+            (image) => (
+            <div
+              key={image.id}
+              className="overflow-hidden rounded-lg border"
+            >
+              <a
+                href={image.image_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={image.image_url}
+                  alt=""
+                  className="h-20 w-full object-cover cursor-pointer"
+                />
+              </a>
+
+              {image.is_cover && (
+                <div className="bg-green-100 py-1 text-center text-[10px] font-medium text-green-700">
+                  ⭐ Cover
+                </div>
+              )}
+            </div>
+          )
+        )}
+      </div>
     </div>
+)}
 
-    <div className="w-full rounded-2xl border bg-card p-5">
+<div className="w-full rounded-2xl border bg-card p-5">
       <div className="space-y-4">
         <div className="w-full rounded-2xl border bg-card p-5">
           <div className="space-y-4">
@@ -402,19 +517,7 @@ return (
 
       <a
         href={`https://wa.me/?text=${encodeURIComponent(
-          `🏠 ${property.property_type}
-
-      ${
-        property.configuration?.trim()
-          ? `🏡 ${property.configuration}\n\n`
-          : ""
-      }📍 ${property.location}
-
-📐 ${property.area_value} ${property.area_unit}
-
-💰 ₹ ${Number(
-            property.price ?? 0
-          ).toLocaleString("en-IN")}`
+          shareText
         )}`}
         target="_blank"
         rel="noopener noreferrer"

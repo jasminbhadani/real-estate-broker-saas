@@ -11,24 +11,47 @@ export default async function EditPropertyPage({
 }) {
   const { id } = await params;
 
-  const broker = await getCurrentBroker();
+  const broker =
+    await getCurrentBroker();
 
   if (!broker) {
     return null;
   }
 
-  const supabase = await createClient();
+  const supabase =
+    await createClient();
 
-  const { data: property } = await supabase
+  const {
+    data: property,
+  } = await supabase
     .from("properties")
     .select("*")
     .eq("id", id)
-    .eq("user_id", broker.profile.id)
+    .eq(
+      "user_id",
+      broker.profile.id
+    )
     .single();
 
   if (!property) {
     notFound();
   }
+
+  const {
+    data: propertyImages,
+  } = await supabase
+    .from("property_images")
+    .select("*")
+    .eq(
+      "property_id",
+      property.id
+    )
+    .order(
+      "sort_order",
+      {
+        ascending: true,
+      }
+    );
 
   return (
     <div className="space-y-4 pb-24">
@@ -36,7 +59,14 @@ export default async function EditPropertyPage({
         Edit Property
       </h1>
 
-      <PropertyForm property={property} />
+      <PropertyForm
+        property={{
+          ...property,
+          images:
+            propertyImages ??
+            [],
+        }}
+      />
     </div>
   );
 }

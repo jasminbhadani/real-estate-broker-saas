@@ -7,6 +7,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useRef, useState } from "react";
+import { setCoverImage } from "@/app/actions/properties";
+import { deletePropertyImage } from "@/app/actions/properties";
 
 interface PropertyFormProps {
   property?: {
@@ -24,12 +27,35 @@ interface PropertyFormProps {
     owner_mobile: string | null;
     owner_alternate_mobile: string | null;
     owner_type: string | null;
+
+    images?: {
+      id: string;
+      image_url: string;
+      is_cover?: boolean | null;
+      sort_order: number | null;
+    }[];
   };
 }
 
 export function PropertyForm({
   property,
 }: PropertyFormProps) {
+
+  const [
+    selectedImages,
+    setSelectedImages,
+  ] = useState<File[]>([]);
+
+  const fileInputRef =
+    useRef<HTMLInputElement>(
+      null
+    );
+
+  const hasExistingCover =
+  property?.images?.some(
+    (img) => img.is_cover
+  ) ?? false;
+
   return (
     <form
       action={
@@ -318,6 +344,288 @@ export function PropertyForm({
             property?.area_value ?? ""
           }
         />
+      </div>
+
+      {/* Property Photos */}
+      <div className="space-y-3">
+        {/* Existing Property Images */}
+        {property?.images &&
+          property.images.length >
+            0 && (
+            <div className="space-y-3 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">
+                  Existing Photos
+                </h3>
+
+                <span className="text-xs text-muted-foreground">
+                  {
+                    property.images
+                      .length
+                  }{" "}
+                  uploaded
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {property.images.map(
+                  (image) => (
+                    <div
+                      key={image.id}
+                      className="overflow-hidden rounded-xl border bg-white shadow-sm"
+                    >
+                      <img
+                        src={
+                          image.image_url
+                        }
+                        alt=""
+                        className="h-28 w-full object-cover"
+                      />
+
+                      <div className="flex items-center justify-between p-2">
+                        {image.is_cover ? (
+                          <span className="rounded-full bg-green-100 px-2 py-1 text-[10px] font-medium text-green-700">
+                            ⭐ Cover
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="text-[10px] text-blue-600"
+                            onClick={async () => {
+                              if (!property?.id) return;
+
+                              await setCoverImage(
+                                image.id,
+                                property.id
+                              );
+
+                              window.location.reload();
+                            }}
+                          >
+                            Make Cover
+                          </button>
+                        )}
+
+                        <button
+                        type="button"
+                        className="text-[10px] text-red-500"
+                        onClick={async () => {
+                          const confirmed =
+                            window.confirm(
+                              "Delete this photo?"
+                            );
+
+                          if (!confirmed)
+                            return;
+
+                          try {
+                            await deletePropertyImage(
+                              image.id
+                            );
+
+                            window.location.reload();
+                          } catch (error) {
+                            alert(
+                              error instanceof Error
+                                ? error.message
+                                : "Unable to delete image"
+                            );
+                          }
+                        }}
+                      >
+                        🗑 Delete
+                      </button>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+        )}
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">
+            Property Photos
+          </label>
+
+          <span className="text-xs text-muted-foreground font-medium">
+            {selectedImages.length}/5 selected
+            {selectedImages.length < 5 &&
+              ` • ${5 - selectedImages.length} remaining`}
+          </span>
+        </div>
+
+        {/* Hidden Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          name="property_images"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            const newFiles = Array.from(
+              e.target.files || []
+            );
+
+            const validFiles =
+              newFiles.filter(
+                (file) =>
+                  file.size <=
+                  3 * 1024 * 1024
+              );
+
+            const updatedFiles = [
+              ...selectedImages,
+              ...validFiles,
+            ].slice(0, 5);
+
+            setSelectedImages(
+              updatedFiles
+            );
+
+            // Sync files back to the native input
+            const dataTransfer =
+              new DataTransfer();
+
+            updatedFiles.forEach(
+              (file) =>
+                dataTransfer.items.add(
+                  file
+                )
+            );
+
+            if (
+              fileInputRef.current
+            ) {
+              fileInputRef.current.files =
+                dataTransfer.files;
+            }
+          }}
+        />
+
+        {/* Add Button */}
+        <button
+          type="button"
+          onClick={() =>
+            fileInputRef.current?.click()
+          }
+          disabled={
+            selectedImages.length >= 5
+          }
+          className="w-full rounded-xl border-2 border-dashed border-gray-300 py-6 px-4 text-center transition hover:bg-gray-50 disabled:opacity-50"
+        >
+          <div className="space-y-2">
+            <div className="text-2xl">
+              📷
+            </div>
+
+            <div className="font-semibold">
+              Add Property Photos
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Tap to select one or more photos
+            </div>
+
+            <div className="text-[11px] text-muted-foreground">
+              JPG, PNG, WEBP • Max 3 MB each
+            </div>
+          </div>
+        </button>
+          
+        {/* Preview Grid */}
+        {selectedImages.length >
+          0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {selectedImages.map(
+              (
+                file,
+                index
+              ) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="overflow-hidden rounded-xl border bg-white shadow-sm transition hover:shadow-md"
+                >
+                  <img
+                    src={URL.createObjectURL(
+                      file
+                    )}
+                    alt=""
+                    className="h-28 w-full object-cover"
+                  />
+
+                  <div className="p-2 space-y-1">
+                    <div className="flex items-center justify-between">
+                      {!hasExistingCover &&
+                        index === 0 && (
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-[10px] font-medium text-green-700">
+                          ⭐ Cover Photo
+                        </span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                      const updated =
+                        selectedImages.filter(
+                          (_, i) =>
+                            i !== index
+                        );
+
+                      setSelectedImages(
+                        updated
+                      );
+
+                      const dataTransfer =
+                        new DataTransfer();
+
+                      updated.forEach(
+                        (file) =>
+                          dataTransfer.items.add(
+                            file
+                          )
+                      );
+
+                      if (
+                        fileInputRef.current
+                      ) {
+                        fileInputRef.current.files =
+                          dataTransfer.files;
+                      }
+                    }}
+                        className="text-red-500 text-xs font-medium hover:underline"
+                        >
+                          🗑 Remove
+                      </button>
+                    </div>
+
+                    <p
+                      className="text-xs font-medium truncate"
+                      title={file.name}
+                    >
+                      {file.name}
+                    </p>
+
+                    <p className="text-[11px] text-muted-foreground">
+                      {(
+                        file.size /
+                        1024 /
+                        1024
+                      ).toFixed(
+                        1
+                      )}{" "}
+                      MB
+                    </p>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          Upload up to 5 photos. You can add photos one by one or select multiple at once.
+        </p>
       </div>
 
       
